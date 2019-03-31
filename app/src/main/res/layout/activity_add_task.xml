@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".notes.AddNoteActivity"
+    android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/edittext"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:gravity="top"
+            android:textColor="@color/colorText"
+            android:textCursorDrawable="@color/colorText"
+            android:background="@color/colorBackground"
+            android:inputType="textMultiLine"/>
+
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Priority"-->
+        <!--android:textSize="20sp"-->
+        <!--android:textStyle="bold"-->
+        <!--android:layout_margin="10dp"/>-->
+
+    <!--<RadioGroup-->
+        <!--android:id="@+id/radiogroup"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_margin="5dp">-->
+        <!--<RadioButton-->
+            <!--android:id="@+id/phigh"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="High"-->
+            <!--android:checked="true"-->
+            <!--android:textSize="20sp"-->
+            <!--android:textStyle="bold"-->
+            <!--android:ems="5"/>-->
+        <!--<RadioButton-->
+            <!--android:id="@+id/pmed"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Medium"-->
+            <!--android:textSize="20sp"-->
+            <!--android:textStyle="bold"-->
+            <!--android:ems="5"/>-->
+        <!--<RadioButton-->
+            <!--android:id="@+id/plow"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Low"-->
+            <!--android:textSize="20sp"-->
+            <!--android:textStyle="bold"-->
+            <!--android:ems="5"/>-->
+    <!--</RadioGroup>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/addbutton"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="ADD"-->
+        <!--android:textStyle="bold"-->
+        <!--android:textSize="20sp"-->
+        <!--android:layout_margin="10dp"/>-->
+
+</LinearLayout>
