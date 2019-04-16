@@ -1,43 +1,40 @@
 package com.example.coyg.todolist.remainders;
 
-import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
+
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.Toast;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import com.example.coyg.todolist.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlacePicker;
 
-public class RemaindersMain extends Fragment  implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.NOTIFICATION_SERVICE;
+
+
+public class RemaindersMain extends Fragment
 {
     private static final String TAG = RemaindersMain.class.getSimpleName();
 
     private static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
     private static final int PLACE_PICKER_REQUEST = 1;
 
-    private GoogleApiClient googleApiClient;
-
-
+    private boolean mIsEnabled;
 
     @Nullable
     @Override
@@ -45,17 +42,30 @@ public class RemaindersMain extends Fragment  implements
     {
         View view = inflater.inflate (R.layout.fragment_remainders, container, false);
 
-
-        googleApiClient = new GoogleApiClient.Builder(getActivity ())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .enableAutoManage(getActivity (), this)
-                .build();
-
         onAddPlaceButtonClicked(view);
         onLocationPermissionClicked(view);
+        onRingerPermissionsClicked(view);
+
+
+
+        Switch onOffSwitch = view.findViewById(R.id.enable_switch);
+        mIsEnabled = getActivity ().getPreferences(MODE_PRIVATE).getBoolean(getString(R.string.setting_enabled), false);
+        onOffSwitch.setChecked(mIsEnabled);
+        onOffSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+//                SharedPreferences.Editor editor = getActivity ().getPreferences(MODE_PRIVATE).edit();
+//                editor.putBoolean(getString(R.string.setting_enabled), isChecked);
+//                mIsEnabled = isChecked;
+//                editor.apply();
+
+//                if (isChecked) geofencing.registerAllGeofences();
+//                else geofencing.unRegisterAllGeofences();
+            }
+
+        });
 
         return view;
     }
@@ -63,40 +73,15 @@ public class RemaindersMain extends Fragment  implements
 
     public void onAddPlaceButtonClicked(View view)
     {
-       view.findViewById (R.id.add_new_loc).setOnClickListener (new View.OnClickListener ()
+        view.findViewById (R.id.add_new_loc).setOnClickListener (new View.OnClickListener ()
        {
            @Override
            public void onClick(View v)
            {
-               if (ActivityCompat.checkSelfPermission (getActivity (), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                       != PackageManager.PERMISSION_GRANTED)
-               {
-                   Toast.makeText (getActivity (), getString (R.string.need_location_permission_message), Toast.LENGTH_LONG).show ();
-                   return;
-               }
-
-               try
-               {
-                   PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder ();
-                   Intent i = intentBuilder.build(getActivity ());
-                   startActivityForResult(i, PLACE_PICKER_REQUEST);
-
-               } catch (GooglePlayServicesRepairableException e)
-               {
-                   Toast.makeText (getActivity (), e.getMessage().toString (), Toast.LENGTH_LONG).show ();
-                   Log.i(TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
-               } catch (GooglePlayServicesNotAvailableException e)
-               {
-                   Log.i(TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
-                   Toast.makeText (getActivity (), e.getMessage().toString (), Toast.LENGTH_LONG).show ();
-
-               } catch (Exception e)
-               {
-                   Log.i(TAG, String.format("PlacePicker Exception: %s", e.getMessage()));
-                   Toast.makeText (getActivity (), e.getMessage().toString (), Toast.LENGTH_LONG).show ();
-
-               }
+               Intent intent = new Intent (getActivity (), MapsActivity.class);
+               startActivity (intent);
            }
+
        });
     }
 
@@ -109,21 +94,27 @@ public class RemaindersMain extends Fragment  implements
                     public void onClick(View v)
                     {
                         ActivityCompat.requestPermissions(getActivity (),
-                                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                                new String[]{ACCESS_FINE_LOCATION},
                                 PERMISSIONS_REQUEST_FINE_LOCATION);
                     }
                 });
     }
 
+
     public void onRingerPermissionsClicked(View view)
     {
-//        Intent intent = null;
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-//        {
-//            intent = new Intent (android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-//        }
-//        startActivity(intent);
+        view.findViewById (R.id.ringer_permissions_checkbox)
+                .setOnClickListener (new View.OnClickListener ()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
     }
+
 
     @Override
     public void onResume()
@@ -132,7 +123,7 @@ public class RemaindersMain extends Fragment  implements
 
         CheckBox locationPermissions = getView ().findViewById(R.id.location_permission_checkbox);
         if (ActivityCompat.checkSelfPermission(getActivity (),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             locationPermissions.setChecked(false);
         }
@@ -141,54 +132,36 @@ public class RemaindersMain extends Fragment  implements
             locationPermissions.setEnabled(false);
         }
 
-//        CheckBox ringerPermissions = findViewById(R.id.ringer_permissions_checkbox);
-//        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//        if (nm != null)
-//        {
-//            if (android.os.Build.VERSION.SDK_INT >= 24 && !nm.isNotificationPolicyAccessGranted())
-//            {
-//                ringerPermissions.setChecked(false);
-//            }
-//            else {
-//                ringerPermissions.setChecked(true);
-//                ringerPermissions.setEnabled(false);
-//            }
-//        }
+        CheckBox ringerPermissions = getActivity ().findViewById(R.id.ringer_permissions_checkbox);
+        NotificationManager nm = (NotificationManager) getActivity ().getSystemService(NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= 24 && !nm.isNotificationPolicyAccessGranted())
+        {
+            ringerPermissions.setChecked(false);
+        }
+        else
+            {
+            ringerPermissions.setChecked(true);
+            ringerPermissions.setEnabled(false);
+        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK)
-        {
-            Place place = PlacePicker.getPlace (getActivity (), data);
-            if (place == null)
-            {
-                Log.i (TAG, "No place selected");
-                return;
-            }
-        }
-        else
-        {
-            Log.i (TAG, requestCode+" - "+resultCode+" - "+data);
-        }
+
+//        if (requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK)
+//        {
+//            Place place = PlacePicker.getPlace (getActivity (), data);
+//            if (place == null)
+//            {
+//                Log.i (TAG, "No place selected");
+//                return;
+//            }
+//        }
+//        else
+//        {
+//            Log.i (TAG, requestCode+" - "+resultCode+" - "+data);
+//        }
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle)
-    {
-        Log.i(TAG, "API Client Connection Successful!");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i)
-    {
-        Log.i(TAG, "API Client Connection Suspended!");
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
-    {
-        Log.e(TAG, "API Client Connection Failed!");
-    }
 }

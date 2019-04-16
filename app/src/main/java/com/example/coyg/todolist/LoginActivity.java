@@ -153,6 +153,7 @@ public class LoginActivity extends AppCompatActivity
         SharedPreferences.Editor editor = getSharedPreferences(getString (R.string.myEmail), MODE_PRIVATE).edit();
         editor.putString("email", email);
         editor.apply();
+
     }
 
     private boolean validation(String email, String password)

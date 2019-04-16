@@ -25,4 +25,7 @@
     <string name="logut">logut</string>
     <string name="clickBack">Please click BACK again to exit</string>
     <string name="myEmail">myEmail</string>
+    <string name="title_activity_maps">Map</string>
+
+
 </resources>

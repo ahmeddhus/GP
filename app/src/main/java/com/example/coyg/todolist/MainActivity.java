@@ -18,14 +18,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.coyg.todolist.database.AppDatabase;
-import com.example.coyg.todolist.database.AppExecutors;
 import com.example.coyg.todolist.notes.AddNoteActivity;
 import com.example.coyg.todolist.notes.NotesMain;
 import com.example.coyg.todolist.remainders.RemaindersMain;
-import com.example.coyg.todolist.remainders.SetRemainderActivity;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
 {
