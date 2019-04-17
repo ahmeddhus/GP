@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.example.coyg.todolist.R;
 
@@ -78,8 +79,18 @@ public class RemaindersMain extends Fragment
            @Override
            public void onClick(View v)
            {
-               Intent intent = new Intent (getActivity (), MapsActivity.class);
-               startActivity (intent);
+
+               if (ActivityCompat.checkSelfPermission(getActivity (),
+                       ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+               {
+                   ActivityCompat.requestPermissions(getActivity (),
+                           new String[]{ACCESS_FINE_LOCATION},
+                           PERMISSIONS_REQUEST_FINE_LOCATION);
+               }
+               else {
+                   Intent intent = new Intent (getActivity (), MapsActivity.class);
+                   startActivity (intent);
+               }
            }
 
        });

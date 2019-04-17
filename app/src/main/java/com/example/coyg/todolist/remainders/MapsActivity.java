@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 import android.location.LocationListener;
@@ -73,9 +74,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission (this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED)
-        {
-            return;
-        }
+            getLocationPermission();
+
         locationManager.requestLocationUpdates (LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE,
                 this);
 
@@ -91,9 +91,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission (this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
                 (this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            return;
-        }
+            getLocationPermission();
+
         mMap.setMyLocationEnabled (true);
         mMap.getUiSettings ().setMyLocationButtonEnabled (true);
 
@@ -108,7 +107,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.moveCamera (CameraUpdateFactory.newLatLng (latLng));
 
                 latLngMain = latLng;
-
             }
         });
     }
@@ -130,7 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (ActivityCompat.checkSelfPermission
                 (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            return;
+            getLocationPermission();
 
         geofencingClient.addGeofences (getGeofencingRequest (), getGeofencePendingIntent ())
                 .addOnSuccessListener (this, new OnSuccessListener<Void> ()
@@ -163,9 +161,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         latLng.longitude,
                         GEOFENCE_RADIUS)
                 .setExpirationDuration(GEOFENCE_TIMEOUT)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                        Geofence.GEOFENCE_TRANSITION_EXIT)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build());
+        //| Geofence.GEOFENCE_TRANSITION_EXIT
     }
 
     private GeofencingRequest getGeofencingRequest()
@@ -207,37 +205,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
     }
 
-//    private void getLocationPermission()
-//    {
-//        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-//                android.Manifest.permission.ACCESS_FINE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED)
-//        {
-//            mLocationPermissionGranted = true;
-//        }
-//        else
-//            {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-//                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-//        }
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode,
-//                                           @NonNull String permissions[],
-//                                           @NonNull int[] grantResults) {
-//        mLocationPermissionGranted = false;
-//        switch (requestCode)
-//        {
-//            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
-//                {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//                {
-//                    mLocationPermissionGranted = true;
-//                }
-//            }
-//        }
-//    }
+    private void getLocationPermission()
+    {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED)
+        {
+            mLocationPermissionGranted = true;
+        }
+        else
+            {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        mLocationPermissionGranted = false;
+        switch (requestCode)
+        {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
+                {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    mLocationPermissionGranted = true;
+                }
+            }
+        }
+    }
 }

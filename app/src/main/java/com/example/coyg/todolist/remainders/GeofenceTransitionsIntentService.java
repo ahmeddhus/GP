@@ -52,13 +52,7 @@ public class GeofenceTransitionsIntentService extends IntentService
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
                 geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT)
         {
-            // Get the geofences that were triggered. A single event can trigger
-            // multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-
-            // Get the transition details as a String.
-//            String geofenceTransitionDetails = getGeofenceTransitionDetails
-//                    (this, geofenceTransition, triggeringGeofences);
 
             sendNotification("TEXT TEXT TEXT");
             Log.i(TAG, "TEXT TEXT TEXT");
