@@ -4,7 +4,8 @@ android {
     signingConfigs {
         keystore {
             keyPassword '12 11 10'
-            storeFile file('E:/Edu/MyProjects/GP/gpKeyStore.jks')
+            storeFile file('E:/Edu/MyProjects/GP-master/gpKeyStore.jks')
+
             storePassword '12 11 10'
             keyAlias 'test'
         }
@@ -53,7 +54,7 @@ dependencies {
 //    implementation 'com.google.android.libraries.places:places-compat:1.1.0'
 
     implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.google.firebase:firebase-auth:16.2.0'
+    implementation 'com.google.firebase:firebase-auth:16.2.1'
     implementation 'com.google.firebase:firebase-firestore:18.2.0'
 }
 apply plugin: 'com.google.gms.google-services'
