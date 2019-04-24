@@ -32,6 +32,10 @@ public class GeofenceTransitionsIntentService extends IntentService
         super ("GeofenceTransitionsIntentService");
     }
 
+//
+//     <service
+//    android:name=".remainders.GeofenceTransitionsIntentService"
+//    android:enabled="true" />
 
     @Override
     protected void onHandleIntent(Intent intent)

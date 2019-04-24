@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.widget.Toast;
 
 import com.example.coyg.todolist.R;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -57,6 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final long GEOFENCE_TIMEOUT = 24 * 60 * 60 * 1000; //24 hours
 
     private LatLng latLngMain;
+    private  Intent intent;
+    private String type="enter";
 
 
     @Override
@@ -68,6 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager ()
                 .findFragmentById (R.id.map);
         mapFragment.getMapAsync (this);
+
+        intent = getIntent();
+        type = intent.getStringExtra("type");
 
         locationManager = (LocationManager) getSystemService (Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission (this,
@@ -115,7 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location)
     {
         LatLng latLng = new LatLng (location.getLatitude (), location.getLongitude ());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom (latLng, 13);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom (latLng, 20);
         mMap.animateCamera (cameraUpdate);
         locationManager.removeUpdates (this);
 
@@ -124,6 +130,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void AddGeofencebtn(View view)
     {
+        if(latLngMain == null)
+        {
+            Toast.makeText(MapsActivity.this, "CHOOSE PLACE", Toast.LENGTH_SHORT).show();
+            return;
+        }
         addGeoence (latLngMain);
 
         if (ActivityCompat.checkSelfPermission
@@ -136,6 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onSuccess(Void aVoid)
                     {
+
                         Toast.makeText (MapsActivity.this, "ADDED", Toast.LENGTH_LONG).show ();
                     }
                 })
@@ -153,7 +165,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addGeoence(LatLng latLng)
     {
-        geofenceList.add(new Geofence.Builder()
+        if(type.equals("enter"))
+            geofenceList.add(new Geofence.Builder()
                 .setRequestId("ID")
 
                 .setCircularRegion(
@@ -161,9 +174,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         latLng.longitude,
                         GEOFENCE_RADIUS)
                 .setExpirationDuration(GEOFENCE_TIMEOUT)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .build());
-        //| Geofence.GEOFENCE_TRANSITION_EXIT
+
+        else if(type.equals("exit"))
+            geofenceList.add(new Geofence.Builder()
+                    .setRequestId("ID")
+
+                    .setCircularRegion(
+                            latLng.latitude,
+                            latLng.longitude,
+                            GEOFENCE_RADIUS)
+                    .setExpirationDuration(GEOFENCE_TIMEOUT)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build());
+
     }
 
     private GeofencingRequest getGeofencingRequest()
@@ -172,7 +197,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //GEOFENCE_TRANSITION_EXIT if user exit
         //INITIAL_TRIGGER_ENTER if enter
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT);
+        if(type.equals("enter"))
+            builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        else if(type.equals("exit"))
+            builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT);
+
+
         builder.addGeofences(geofenceList);
         return builder.build();
     }
@@ -182,7 +212,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (geofencePendingIntent != null)
             return geofencePendingIntent;
 
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+//        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+
+        Intent intent = new Intent(this, GeofenceTransService.class);
+
         geofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         return geofencePendingIntent;
