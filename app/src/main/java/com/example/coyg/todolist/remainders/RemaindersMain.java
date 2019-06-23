@@ -1,6 +1,7 @@
 package com.example.coyg.todolist.remainders;
 
-import android.app.NotificationManager;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -9,24 +10,36 @@ import android.support.annotation.Nullable;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.RadioGroup;
 import com.example.coyg.todolist.R;
+import com.example.coyg.todolist.database.AppDatabase;
+import com.example.coyg.todolist.database.MainViewModel;
+import com.example.coyg.todolist.database.RemainderEntry;
+
+import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.Context.NOTIFICATION_SERVICE;
 
-public class RemaindersMain extends Fragment
+public class RemaindersMain extends Fragment implements RemainderAdapter.ItemClickListener
 {
     private static final String TAG = RemaindersMain.class.getSimpleName();
 
     private static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
 
+    private AppDatabase appDatabase;
+
     RadioGroup radioGroup;
     private Intent intent;
+
+    RemainderAdapter remainderAdapter;
+    RecyclerView recyclerView;
 
     @Nullable
     @Override
@@ -36,13 +49,26 @@ public class RemaindersMain extends Fragment
 
         intent = new Intent (getActivity (), MapsActivity.class);
 
+        initViews(view);
+
         RadiobtnsAction(view);
         onAddPlaceButtonClicked(view);
         onLocationPermissionClicked(view);
+        setupViewModel();
 
         return view;
     }
 
+    private void initViews(View view)
+    {
+        appDatabase = AppDatabase.getsInstance ((getActivity ()));
+
+        recyclerView = view.findViewById (R.id.remainders_rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
+        remainderAdapter = new RemainderAdapter (getActivity (), this);
+        recyclerView.addItemDecoration (new DividerItemDecoration (recyclerView.getContext (), DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(remainderAdapter);
+    }
 
     public void onAddPlaceButtonClicked(View view)
     {
@@ -123,4 +149,26 @@ public class RemaindersMain extends Fragment
             locationPermissions.setEnabled(false);
         }
     }
+
+    private void setupViewModel()
+    {
+        MainViewModel mainViewModel = ViewModelProviders.of (this).get(MainViewModel.class);
+        mainViewModel.getRemainder ().observe (this, new Observer<List<RemainderEntry>> ()
+        {
+            @Override
+            public void onChanged(@Nullable List<RemainderEntry> remainderEntries)
+            {
+                remainderAdapter.setRemainders (remainderEntries);
+            }
+        });
+    }
+
+    @Override
+    public void onItemClickActionListener(String position)
+    {
+//        Intent intent = new Intent (getActivity (), AddNoteActivity.class);
+//        intent.putExtra (AddNoteActivity.EXTRA_TASK_ID, position);
+//        startActivity (intent);
+    }
+
 }

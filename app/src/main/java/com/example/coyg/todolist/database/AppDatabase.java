@@ -8,7 +8,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.util.Log;
 
-@Database (entities = {TaskEntry.class}, version = 1, exportSchema = false)
+@Database (entities = {TaskEntry.class, RemainderEntry.class}, version = 2, exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase
 {
@@ -36,4 +36,5 @@ public abstract class AppDatabase extends RoomDatabase
     }
 
     public abstract TaskDAO taskDAO();
+    public abstract RemainderDAO remainderDAO();
 }

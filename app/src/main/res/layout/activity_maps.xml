@@ -10,7 +10,7 @@
     android:fitsSystemWindows="true"
     tools:context=".remainders.MapsActivity">
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:map="http://schemas.android.com/apk/res-auto"
           xmlns:tools="http://schemas.android.com/tools"
           android:id="@+id/map"
@@ -25,6 +25,17 @@
           map:uiZoomControls="false"
           map:uiZoomGestures="true"
           tools:context=".remainders.MapsActivity"/>
+
+
+    <fragment android:id="@+id/autocomplete_fragment"
+              android:layout_width="50dp"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:layout_alignParentStart="true"
+              android:layout_margin="8dp"
+              android:background="@android:color/white"
+              android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>
+
 
     <Button
         android:layout_width="match_parent"

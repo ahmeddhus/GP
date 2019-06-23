@@ -1,6 +1,7 @@
 package com.example.coyg.todolist.remainders;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -11,14 +12,22 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.coyg.todolist.R;
 
+import com.example.coyg.todolist.database.AppDatabase;
+import com.example.coyg.todolist.database.AppExecutors;
+import com.example.coyg.todolist.database.RemainderEntry;
+import com.example.coyg.todolist.database.TaskEntry;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -34,8 +43,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener
@@ -45,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMapOptions options;
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    int AUTOCOMPLETE_REQUEST_CODE = 1;
     private boolean mLocationPermissionGranted;
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
@@ -60,7 +80,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng latLngMain;
     private  Intent intent;
     private String type="enter";
-
+    private AppDatabase mDb;
+    private RemainderEntry remainderEntry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -70,10 +91,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager ()
                 .findFragmentById (R.id.map);
+
         mapFragment.getMapAsync (this);
 
         intent = getIntent();
         type = intent.getStringExtra("type");
+        mDb = AppDatabase.getsInstance (getApplicationContext ());
 
         locationManager = (LocationManager) getSystemService (Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission (this,
@@ -86,6 +109,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 this);
 
         geofencingClient = LocationServices.getGeofencingClient (this);
+
+
+        if (!Places.isInitialized())
+        {
+            Places.initialize(getApplicationContext (), getApplicationContext ().getString(R.string.google_maps_key));
+        }
+
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        if (autocompleteFragment != null)
+        {
+            autocompleteFragment.setPlaceFields(Collections.singletonList (Place.Field.LAT_LNG));
+
+            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener ()
+            {
+                @Override
+                public void onPlaceSelected(@NonNull Place place)
+                {
+                    latLngMain = place.getLatLng ();
+                    mMap.clear ();
+                    mMap.addMarker (new MarkerOptions ().position (latLngMain).title ("-"));
+                    mMap.moveCamera (CameraUpdateFactory.newLatLng (latLngMain));
+                }
+
+                @Override
+                public void onError(@NonNull Status status)
+                {
+                    Toast.makeText (MapsActivity.this, "An error occurred: "+status, Toast.LENGTH_LONG).show ();
+                }
+            });
+        }
     }
 
 
@@ -124,12 +179,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom (latLng, 20);
         mMap.animateCamera (cameraUpdate);
         locationManager.removeUpdates (this);
-
     }
 
 
     public void AddGeofencebtn(View view)
     {
+        theDialog();
         if(latLngMain == null)
         {
             Toast.makeText(MapsActivity.this, "CHOOSE PLACE", Toast.LENGTH_SHORT).show();
@@ -160,6 +215,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
 
+        onSaveButtonClicked("name", latLngMain.toString (), type);
         finish ();
     }
 
@@ -270,5 +326,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
+    }
+
+    public void onSaveButtonClicked(String name, String latLng, String type)
+    {
+        remainderEntry = new RemainderEntry (name, latLng, type);
+        AppExecutors.getInstance ().getDiskIO ().execute (new Runnable ()
+        {
+            @Override
+            public void run()
+            {
+                mDb.remainderDAO().insertRemainder (remainderEntry);
+                finish ();
+            }
+        });
+    }
+
+    private void theDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder (MapsActivity.this);
+        builder.setTitle ("Remainder Name");
+
+        final EditText input = new EditText (MapsActivity.this);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams (
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          LinearLayout.LayoutParams.MATCH_PARENT
+        );
+
+        input.setLayoutParams (layoutParams);
+        builder.setView (input);
     }
 }
