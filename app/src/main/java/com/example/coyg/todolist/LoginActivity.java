@@ -264,14 +264,20 @@ public class LoginActivity extends AppCompatActivity
                                 {
                                     Log.d(TAG, document.getId() + " => " + document.getData());
 
-                                    TaskEntry taskEntry = new TaskEntry
-                                            (
-                                                    document.getId(),
-                                                    document.get ("note").toString (),
-                                                    document.get ("date").toString ()
-                                            );
+                                    if( document.getId() != null &&
+                                            document.get ("note") != null &&
+                                            document.get ("date") != null)
+                                    {
+                                        TaskEntry taskEntry = new TaskEntry
+                                                (
+                                                        document.getId(),
+                                                        document.get ("note").toString (),
+                                                        document.get ("date").toString ()
+                                                );
+                                        appDatabase.taskDAO ().insertTask (taskEntry);
+                                    }
 
-                                    appDatabase.taskDAO ().insertTask (taskEntry);
+
                                 }
                                 progressDialog.dismiss ();
                             }
