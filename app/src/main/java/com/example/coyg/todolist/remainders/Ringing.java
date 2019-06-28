@@ -31,7 +31,7 @@ public class Ringing extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ringing);
 
-        close_alarm = findViewById(R.id.close_alarm);
+        close_alarm = findViewById(R.id.close_ringing);
         geofencingClient = LocationServices.getGeofencingClient (this);
 
         notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);

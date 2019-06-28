@@ -27,5 +27,7 @@
     <string name="myEmail">myEmail</string>
     <string name="title_activity_maps">Map</string>
 
+    <string name="facebook_app_id">681745572285685</string>
+    <string name="fb_login_protocol_scheme">fb681745572285685</string>
 
 </resources>

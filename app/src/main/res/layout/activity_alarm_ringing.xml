@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/quantum_error_light"
-    tools:context=".remainders.Ringing">
+    tools:context=".remainders.alarm.AlarmRinging">
 
     <TextView
-        android:id="@+id/ringtxt"
+        android:id="@+id/alarmtxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:gravity="center"
         android:layout_centerInParent="true"
         android:textSize="60sp"
-        android:text="YOU\nHAVE\nREACHED\n!!"/>
+        android:text="WAKE-UP!\nWAKE-UP!\nWAKE-UP!"/>
     <Button
-        android:id="@+id/close_ringing"
+        android:id="@+id/close_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ringtxt"
+        android:layout_below="@+id/alarmtxt"
         android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
         android:layout_margin="50dp"
         android:textColor="@color/colorPrimaryDark"
         android:background="@drawable/item_shape"

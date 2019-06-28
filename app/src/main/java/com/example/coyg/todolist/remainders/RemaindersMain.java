@@ -18,16 +18,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.RadioGroup;
+import android.widget.Toast;
+
 import com.example.coyg.todolist.R;
 import com.example.coyg.todolist.database.AppDatabase;
 import com.example.coyg.todolist.database.MainViewModel;
 import com.example.coyg.todolist.database.RemainderEntry;
+import com.example.coyg.todolist.notes.AddNoteActivity;
 
 import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class RemaindersMain extends Fragment implements RemainderAdapter.ItemClickListener
+public class RemaindersMain extends Fragment
 {
     private static final String TAG = RemaindersMain.class.getSimpleName();
 
@@ -65,8 +68,8 @@ public class RemaindersMain extends Fragment implements RemainderAdapter.ItemCli
 
         recyclerView = view.findViewById (R.id.remainders_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
-        remainderAdapter = new RemainderAdapter (getActivity (), this);
-        recyclerView.addItemDecoration (new DividerItemDecoration (recyclerView.getContext (), DividerItemDecoration.VERTICAL));
+        remainderAdapter = new RemainderAdapter (getActivity ());
+        //recyclerView.addItemDecoration (new DividerItemDecoration (recyclerView.getContext (), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(remainderAdapter);
     }
 
@@ -162,13 +165,4 @@ public class RemaindersMain extends Fragment implements RemainderAdapter.ItemCli
             }
         });
     }
-
-    @Override
-    public void onItemClickActionListener(String position)
-    {
-//        Intent intent = new Intent (getActivity (), AddNoteActivity.class);
-//        intent.putExtra (AddNoteActivity.EXTRA_TASK_ID, position);
-//        startActivity (intent);
-    }
-
 }

@@ -1,8 +1,11 @@
 package com.example.coyg.todolist;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,24 +17,35 @@ import android.widget.Toast;
 
 import com.example.coyg.todolist.database.AppDatabase;
 import com.example.coyg.todolist.database.TaskEntry;
-import com.example.coyg.todolist.notes.GetNoteCloud;
-import com.example.coyg.todolist.notes.NotesMain;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 public class LoginActivity extends AppCompatActivity
 {
@@ -44,6 +58,14 @@ public class LoginActivity extends AppCompatActivity
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
+    private CallbackManager callbackManager;
+    public LoginButton loginFB;
+    public AccessToken accessToken;
+
+    ConnectivityManager connectivityManager;
+    NetworkInfo mWifi;
+    NetworkInfo mData;
+
     ProgressDialog progressDialog;
 
     @Override
@@ -53,10 +75,16 @@ public class LoginActivity extends AppCompatActivity
         setContentView (R.layout.activity_login);
 
         init ();
+        signFB();
     }
 
     private void init()
     {
+        loginFB = findViewById (R.id.loginFB);
+        loginFB.setReadPermissions("email");
+        callbackManager = CallbackManager.Factory.create();
+        accessToken = AccessToken.getCurrentAccessToken ();
+
         email_edittext = findViewById (R.id.email_edittext);
         password_edittext = findViewById (R.id.password_edittext);
 
@@ -64,6 +92,11 @@ public class LoginActivity extends AppCompatActivity
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+//
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.default_web_client_id))
+//                .requestEmail()
+//                .build();
     }
 
     @Override
@@ -75,6 +108,12 @@ public class LoginActivity extends AppCompatActivity
         if (currentUser != null)
             updateUI(currentUser);
     }
+
+//    private void signIn()
+//    {
+//        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+//        startActivityForResult(signInIntent, RC_SIGN_IN);
+//    }
 
     public void DoLogin(View view)
     {
@@ -242,5 +281,85 @@ public class LoginActivity extends AppCompatActivity
                         }
                     }
                 });
+    }
+
+//    public void FBbtn(View view)
+//    {
+//        connectivityManager = (ConnectivityManager) getSystemService (Context.CONNECTIVITY_SERVICE);
+//
+//        if (connectivityManager != null)
+//        {
+//            mWifi = connectivityManager.getNetworkInfo (ConnectivityManager.TYPE_WIFI);
+//            mData = connectivityManager.getNetworkInfo (ConnectivityManager.TYPE_MOBILE);
+//        }
+//        if(mWifi.isConnected ()||mData.isConnected ())
+//        {
+//            //LoginManager.getInstance().logInWithReadPermissions(this, Collections.singletonList ("public_profile"));
+//        }
+//        else
+//        {
+//            Toast.makeText (LoginActivity.this, "Check The Internet", Toast.LENGTH_LONG).show ();
+//        }
+//    }
+
+    public void signFB()
+    {
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>()
+                {
+                    @Override
+                    public void onSuccess(LoginResult loginResult)
+                    {
+                        handleFacebookAccessToken(loginResult.getAccessToken());
+                    }
+
+                    @Override
+                    public void onCancel()
+                    {
+                        Toast.makeText (LoginActivity.this, "FB onCancel" , Toast.LENGTH_SHORT).show ();
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception)
+                    {
+                        Toast.makeText (LoginActivity.this, "FB onError"+exception.toString () , Toast.LENGTH_SHORT).show ();
+                    }
+                });
+    }
+
+    private void handleFacebookAccessToken(AccessToken token)
+    {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult> ()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            Intent intent = new Intent (LoginActivity.this, MainActivity.class);
+                            startActivity (intent);
+                            Toast.makeText (LoginActivity.this, "login successful", Toast.LENGTH_SHORT).show ();
+
+                        } else
+                        {
+//                            // If sign in fails, display a message to the user.
+                            Toast.makeText (LoginActivity.this, "an error has occurred!"+task.getException().toString (),
+                                    Toast.LENGTH_SHORT).show ();
+                            Log.e (TAG,"Authentication failed.");
+                        }
+                    }
+
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -7,15 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/icon3"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/apptxt"/>
+
     <TextView
+        android:id="@+id/apptxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="RM"
-        android:textSize="80sp"
-        android:textStyle="bold"
+        android:text="RemindMe"
+        android:textSize="24sp"
         android:textColor="@color/colorText"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="125dp"/>
+        android:layout_marginBottom="40dp"
+        android:layout_above="@+id/layout_edittext"/>
 
     <LinearLayout
         android:id="@+id/layout_edittext"
@@ -66,7 +75,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_edittext"
-
         android:layout_centerHorizontal="true"
         android:orientation="horizontal">
         <Button
@@ -74,6 +82,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:textColor="@color/colorText"
+            android:background="@drawable/btn_shape"
             android:text="Login"
             android:onClick="DoLogin"/>
 
@@ -82,8 +92,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:textColor="@color/colorText"
+            android:background="@drawable/btn_shape"
             android:text="Signup"
             android:onClick="DoSingup"/>
     </LinearLayout>
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/loginFB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_below="@+id/layout_btn"
+        android:visibility="gone"/>
 
 </RelativeLayout>

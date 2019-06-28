@@ -2,8 +2,10 @@ package com.example.coyg.todolist.remainders;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -17,6 +19,7 @@ import android.view.View;
 
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -66,6 +69,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     int AUTOCOMPLETE_REQUEST_CODE = 1;
     private boolean mLocationPermissionGranted;
+    public static final String LAT_SAVED = "lat";
+    public static final String LNG_SAVED = "lng";
+    public static final String TYPE_SAVED = "lng";
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
@@ -79,9 +85,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng latLngMain;
     private  Intent intent;
-    private String type="enter";
+    private String typeShared="enter";
     private AppDatabase mDb;
     private RemainderEntry remainderEntry;
+
+    private Button addBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -95,8 +103,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync (this);
 
         intent = getIntent();
-        type = intent.getStringExtra("type");
+        typeShared = intent.getStringExtra("type");
         mDb = AppDatabase.getsInstance (getApplicationContext ());
+        addBtn = findViewById (R.id.addBtn);
+
 
         locationManager = (LocationManager) getSystemService (Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission (this,
@@ -154,22 +164,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 (this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             getLocationPermission();
 
-        mMap.setMyLocationEnabled (true);
-        mMap.getUiSettings ().setMyLocationButtonEnabled (true);
-
-        mMap.setOnMapClickListener (new GoogleMap.OnMapClickListener ()
+        if(intent != null && intent.hasExtra (LAT_SAVED) && intent.hasExtra (LNG_SAVED))
         {
-            @Override
-            public void onMapClick(LatLng latLng)
-            {
-                mMap.clear ();
-                mMap.addMarker (new MarkerOptions ().position (latLng)
-                        .title ("-"));
-                mMap.moveCamera (CameraUpdateFactory.newLatLng (latLng));
+            double lat = intent.getDoubleExtra (LAT_SAVED, 0);
+            double lng = intent.getDoubleExtra (LNG_SAVED, 0);
 
-                latLngMain = latLng;
-            }
-        });
+            LatLng lngSaved = new LatLng (lat, lng);
+
+            mMap.addMarker (new MarkerOptions ().position (lngSaved).title ("-"));
+            mMap.moveCamera (CameraUpdateFactory.newLatLng (lngSaved));
+
+            latLngMain = lngSaved;
+            //addBtn.setVisibility (View.GONE);
+        }
+        else
+        {
+            mMap.setMyLocationEnabled (true);
+            mMap.getUiSettings ().setMyLocationButtonEnabled (true);
+
+            mMap.setOnMapClickListener (new GoogleMap.OnMapClickListener ()
+            {
+                @Override
+                public void onMapClick(LatLng latLng)
+                {
+                    mMap.clear ();
+                    mMap.addMarker (new MarkerOptions ().position (latLng)
+                            .title ("-"));
+                    mMap.moveCamera (CameraUpdateFactory.newLatLng (latLng));
+
+                    latLngMain = latLng;
+                }
+            });
+        }
     }
 
     @Override
@@ -184,42 +210,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void AddGeofencebtn(View view)
     {
-        theDialog();
         if(latLngMain == null)
         {
             Toast.makeText(MapsActivity.this, "CHOOSE PLACE", Toast.LENGTH_SHORT).show();
             return;
         }
-        addGeoence (latLngMain);
 
-        if (ActivityCompat.checkSelfPermission
-                (this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            getLocationPermission();
-
-        geofencingClient.addGeofences (getGeofencingRequest (), getGeofencePendingIntent ())
-                .addOnSuccessListener (this, new OnSuccessListener<Void> ()
-                {
-                    @Override
-                    public void onSuccess(Void aVoid)
-                    {
-
-                        Toast.makeText (MapsActivity.this, "ADDED", Toast.LENGTH_LONG).show ();
-                    }
-                })
-                .addOnFailureListener (this, new OnFailureListener ()
-                {
-                    @Override
-                    public void onFailure(@NonNull Exception e)
-                    {
-                        Toast.makeText (MapsActivity.this, "FAILED", Toast.LENGTH_LONG).show ();
-                    }
-                });
-
-        onSaveButtonClicked("name", latLngMain.toString (), type);
-        finish ();
+        theDialog(latLngMain, typeShared);
     }
 
-    private void addGeoence(LatLng latLng)
+    private void addGeoence(LatLng latLng, String type)
     {
         if(type.equals("enter"))
             geofenceList.add(new Geofence.Builder()
@@ -247,7 +247,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private GeofencingRequest getGeofencingRequest()
+    private GeofencingRequest getGeofencingRequest(String type)
     {
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
 
@@ -328,9 +328,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void onSaveButtonClicked(String name, String latLng, String type)
+    public void onSaveButtonClicked(String name, double lat, double lng, String type)
     {
-        remainderEntry = new RemainderEntry (name, latLng, type);
+        remainderEntry = new RemainderEntry (name, lat, lng, type);
         AppExecutors.getInstance ().getDiskIO ().execute (new Runnable ()
         {
             @Override
@@ -342,18 +342,96 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private void theDialog()
+    private void theDialog(final LatLng latLng, final String type)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder (MapsActivity.this);
-        builder.setTitle ("Remainder Name");
 
-        final EditText input = new EditText (MapsActivity.this);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams (
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.MATCH_PARENT
-        );
+        if(intent != null && intent.hasExtra (LAT_SAVED) && intent.hasExtra (LNG_SAVED))
+        {
+            String typeSaved = intent.getStringExtra (TYPE_SAVED);
 
-        input.setLayoutParams (layoutParams);
-        builder.setView (input);
+            addGeoence (latLng, typeSaved);
+
+            if (ActivityCompat.checkSelfPermission
+                    (MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                getLocationPermission();
+
+            geofencingClient.addGeofences (getGeofencingRequest (typeSaved), getGeofencePendingIntent ())
+                    .addOnSuccessListener (MapsActivity.this, new OnSuccessListener<Void> ()
+                    {
+                        @Override
+                        public void onSuccess(Void aVoid)
+                        {
+
+                            Toast.makeText (MapsActivity.this, "ADDED", Toast.LENGTH_LONG).show ();
+                        }
+                    })
+                    .addOnFailureListener (MapsActivity.this, new OnFailureListener ()
+                    {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+                            Toast.makeText (MapsActivity.this, "FAILED", Toast.LENGTH_LONG).show ();
+                        }
+                    });
+
+            finish ();
+        }
+        else
+        {
+            final Dialog dialog = new Dialog (MapsActivity.this);
+            dialog.setContentView (R.layout.the_dialog);
+            dialog.setTitle ("Reminder Name");
+            dialog.setCancelable (false);
+
+            final EditText name_dialog = dialog.findViewById (R.id.name_dialog);
+
+            Button dialog_btn = dialog.findViewById (R.id.dialog_btn);
+
+            dialog.show ();
+
+            dialog_btn.setOnClickListener (new View.OnClickListener ()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if( name_dialog.getText ().toString ().isEmpty ())
+                    {
+                        Toast.makeText(MapsActivity.this, "ENTER THE NAME", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    addGeoence (latLng, type);
+                    if (ActivityCompat.checkSelfPermission
+                            (MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                        getLocationPermission();
+                    geofencingClient.addGeofences (getGeofencingRequest (type), getGeofencePendingIntent ())
+                            .addOnSuccessListener (MapsActivity.this, new OnSuccessListener<Void> ()
+                            {
+                                @Override
+                                public void onSuccess(Void aVoid)
+                                {
+
+                                    Toast.makeText (MapsActivity.this, "ADDED", Toast.LENGTH_LONG).show ();
+                                    onSaveButtonClicked(
+                                            name_dialog.getText ().toString (),
+                                            latLng.latitude,
+                                            latLng.longitude,
+                                            type);
+                                }
+                            })
+                            .addOnFailureListener (MapsActivity.this, new OnFailureListener ()
+                            {
+                                @Override
+                                public void onFailure(@NonNull Exception e)
+                                {
+                                    Toast.makeText (MapsActivity.this, "FAILED", Toast.LENGTH_LONG).show ();
+                                }
+                            });
+
+                    dialog.dismiss ();
+                    finish ();
+                }
+            });
+        }
     }
 }

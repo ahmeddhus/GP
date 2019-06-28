@@ -12,13 +12,15 @@ public class RemainderEntry
     @PrimaryKey(autoGenerate = true)
     public int id;
     private String name;
-    private String latLng;
+    private double lat;
+    private double lng;
     private String type;
 
-    public RemainderEntry(String name, String latLng, String type)
+    public RemainderEntry(String name, double lat, double lng, String type)
     {
         this.name = name;
-        this.latLng = latLng;
+        this.lat = lat;
+        this.lng = lng;
         this.type = type;
     }
 
@@ -43,14 +45,24 @@ public class RemainderEntry
         this.name = name;
     }
 
-    public String getLatLng()
+    public double getLat()
     {
-        return latLng;
+        return lat;
     }
 
-    public void setLatLng(String latLng)
+    public void setLat(double lat)
     {
-        this.latLng = latLng;
+        this.lat = lat;
+    }
+
+    public double getLng()
+    {
+        return lng;
+    }
+
+    public void setLng(double lng)
+    {
+        this.lng = lng;
     }
 
     public String getType()

@@ -1,33 +1,35 @@
 package com.example.coyg.todolist.notes;
 
-import android.app.ActionBar;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Window;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TimePicker;
 
 import com.example.coyg.todolist.R;
 import com.example.coyg.todolist.database.AppDatabase;
 import com.example.coyg.todolist.database.AppExecutors;
 import com.example.coyg.todolist.database.TaskEntry;
+import com.example.coyg.todolist.remainders.alarm.AlarmReceiver;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -52,6 +54,9 @@ public class AddNoteActivity extends AppCompatActivity
 
     private FirebaseFirestore firebaseFirestore;
     FirebaseFirestoreSettings firebaseFirestoreSettings;
+
+    AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -93,6 +98,8 @@ public class AddNoteActivity extends AppCompatActivity
                 .build();
 
         firebaseFirestore.setFirestoreSettings(firebaseFirestoreSettings);
+
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 
     @Override
@@ -223,5 +230,44 @@ public class AddNoteActivity extends AppCompatActivity
     {
         SharedPreferences prefs = getSharedPreferences(getString (R.string.myEmail), MODE_PRIVATE);
         return prefs.getString("email", "No name defined");
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater ().inflate (R.menu.menu_addnote, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId ();
+
+        if(id == R.id.set_reminder)
+        {
+            Calendar mcurrentTime = Calendar.getInstance();
+            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+            int minute = mcurrentTime.get(Calendar.MINUTE);
+            final String des = editText.getText ().toString ();
+
+            new TimePickerDialog (AddNoteActivity.this, R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener ()
+            {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute)
+                {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    calendar.set(Calendar.MINUTE, minute);
+                    Intent myIntent = new Intent(AddNoteActivity.this, AlarmReceiver.class);
+                    myIntent.putExtra ("note", des);
+                    pendingIntent = PendingIntent.getBroadcast(AddNoteActivity.this, 0, myIntent, 0);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }
+            }, hour, minute, false).show ();
+            return true;
+        }
+        return super.onOptionsItemSelected (item);
     }
 }

@@ -21,6 +21,7 @@ import com.example.coyg.todolist.database.AppDatabase;
 import com.example.coyg.todolist.notes.AddNoteActivity;
 import com.example.coyg.todolist.notes.NotesMain;
 import com.example.coyg.todolist.remainders.RemaindersMain;
+import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity
@@ -81,8 +82,10 @@ public class MainActivity extends AppCompatActivity
         if(id == R.id.logout_itemmenu)
         {
             FirebaseAuth.getInstance().signOut();
+            LoginManager.getInstance().logOut();
 
             appDatabase.taskDAO ().deleteALL ();
+            appDatabase.remainderDAO ().deleteALL ();
 
             Intent i = new Intent (MainActivity.this, LoginActivity.class);
             startActivity (i);
