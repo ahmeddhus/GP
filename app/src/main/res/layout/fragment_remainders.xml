@@ -47,8 +47,8 @@
                     android:textColor="@color/colorAccent"
                     android:buttonTint="@color/colorAccent"
                     android:checked="true"
-                    android:layout_marginLeft="25dp"
-                    android:text="Enter"/>
+                    android:layout_marginStart="25dp"
+                    android:text="@string/enter"/>
 
                 <RadioButton
                     android:id="@+id/exit"
@@ -56,8 +56,8 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorAccent"
                     android:buttonTint="@color/colorAccent"
-                    android:layout_marginLeft="25dp"
-                    android:text="Exit"/>
+                    android:layout_marginStart="25dp"
+                    android:text="@string/exit"/>
 
             </RadioGroup>
 
@@ -116,7 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:text="Reminders"
+            android:text="@string/reminders"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/colorText" />
 
@@ -135,15 +135,5 @@
             android:gravity="center">
         </android.support.v7.widget.RecyclerView>
 
-        <!--<TextView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:text="NOTE: if you close the app the event will be cancelled!"-->
-            <!--android:gravity="center"-->
-            <!--android:layout_marginTop="80dp"-->
-            <!--android:textSize="30sp"-->
-            <!--android:textColor="#FF0000"-->
-            <!--/>-->
     </LinearLayout>
 </RelativeLayout>

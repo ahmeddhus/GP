@@ -14,9 +14,10 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:gravity="center"
+        android:maxLines="5"
         android:layout_centerInParent="true"
         android:textSize="60sp"
-        android:text="WAKE-UP!\nWAKE-UP!\nWAKE-UP!"/>
+        android:text=""/>
     <Button
         android:id="@+id/close_alarm"
         android:layout_width="wrap_content"
@@ -27,6 +28,6 @@
         android:layout_margin="50dp"
         android:textColor="@color/colorPrimaryDark"
         android:background="@drawable/item_shape"
-        android:text="CLOSE"/>
+        android:text="@string/close"/>
 
 </RelativeLayout>

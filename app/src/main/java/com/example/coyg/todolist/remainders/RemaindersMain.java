@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,10 @@ import android.widget.Toast;
 
 import com.example.coyg.todolist.R;
 import com.example.coyg.todolist.database.AppDatabase;
+import com.example.coyg.todolist.database.AppExecutors;
 import com.example.coyg.todolist.database.MainViewModel;
 import com.example.coyg.todolist.database.RemainderEntry;
+import com.example.coyg.todolist.database.TaskEntry;
 import com.example.coyg.todolist.notes.AddNoteActivity;
 
 import java.util.List;
@@ -58,6 +61,7 @@ public class RemaindersMain extends Fragment
         onAddPlaceButtonClicked(view);
         onLocationPermissionClicked(view);
         setupViewModel();
+        swapToDel();
 
         return view;
     }
@@ -69,7 +73,6 @@ public class RemaindersMain extends Fragment
         recyclerView = view.findViewById (R.id.remainders_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager (getActivity (), LinearLayoutManager.VERTICAL, false));
         remainderAdapter = new RemainderAdapter (getActivity ());
-        //recyclerView.addItemDecoration (new DividerItemDecoration (recyclerView.getContext (), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(remainderAdapter);
     }
 
@@ -164,5 +167,33 @@ public class RemaindersMain extends Fragment
                 remainderAdapter.setRemainders (remainderEntries);
             }
         });
+    }
+
+    private void swapToDel()
+    {
+
+        new ItemTouchHelper (new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+        {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+            @Override
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir)
+            {
+                AppExecutors.getInstance ().getDiskIO ().execute (new Runnable ()
+                {
+                    @Override
+                    public void run()
+                    {
+                        int position = viewHolder.getAdapterPosition ();
+                        List<RemainderEntry> remainderEntries = remainderAdapter.getRemainderEntriess ();
+                        appDatabase.remainderDAO ().delete (remainderEntries.get (position));
+
+                    }
+                });
+            }
+        }).attachToRecyclerView(recyclerView);
     }
 }

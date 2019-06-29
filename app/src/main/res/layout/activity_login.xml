@@ -19,7 +19,7 @@
         android:id="@+id/apptxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="RemindMe"
+        android:text="@string/app_name"
         android:textSize="24sp"
         android:textColor="@color/colorText"
         android:layout_centerHorizontal="true"
@@ -84,7 +84,7 @@
             android:layout_margin="8dp"
             android:textColor="@color/colorText"
             android:background="@drawable/btn_shape"
-            android:text="Login"
+            android:text="@string/login"
             android:onClick="DoLogin"/>
 
         <Button
@@ -94,7 +94,7 @@
             android:layout_margin="8dp"
             android:textColor="@color/colorText"
             android:background="@drawable/btn_shape"
-            android:text="Signup"
+            android:text="@string/signup"
             android:onClick="DoSingup"/>
     </LinearLayout>
 

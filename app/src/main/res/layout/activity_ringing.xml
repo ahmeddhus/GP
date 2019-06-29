@@ -15,7 +15,7 @@
         android:gravity="center"
         android:layout_centerInParent="true"
         android:textSize="60sp"
-        android:text="YOU\nHAVE\nREACHED\n!!"/>
+        android:text="@string/you_nhave_nreached_n"/>
     <Button
         android:id="@+id/close_ringing"
         android:layout_width="wrap_content"
@@ -25,6 +25,6 @@
         android:layout_margin="50dp"
         android:textColor="@color/colorPrimaryDark"
         android:background="@drawable/item_shape"
-        android:text="CLOSE"/>
+        android:text="@string/close"/>
 
 </RelativeLayout>

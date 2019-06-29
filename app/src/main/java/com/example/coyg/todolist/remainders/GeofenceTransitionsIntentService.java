@@ -32,11 +32,6 @@ public class GeofenceTransitionsIntentService extends IntentService
         super ("GeofenceTransitionsIntentService");
     }
 
-//
-//     <service
-//    android:name=".remainders.GeofenceTransitionsIntentService"
-//    android:enabled="true" />
-
     @Override
     protected void onHandleIntent(Intent intent)
     {
@@ -44,8 +39,6 @@ public class GeofenceTransitionsIntentService extends IntentService
 
         if (geofencingEvent.hasError ())
         {
-//            String errorMessage = GeofenceErrorMessages.getErrorString (this,
-//                    geofencingEvent.getErrorCode ());
             Log.e (TAG, "GeofenceErrorMessages");
             return;
 

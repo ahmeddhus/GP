@@ -18,7 +18,7 @@
             android:layout_margin="8dp"
             android:padding="8dp"
             android:background="@drawable/item_shape"
-            android:text="NAME"
+            android:text="@string/name"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="20sp"/>
     </RelativeLayout>

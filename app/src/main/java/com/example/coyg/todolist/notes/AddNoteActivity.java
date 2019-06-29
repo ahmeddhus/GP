@@ -261,6 +261,7 @@ public class AddNoteActivity extends AppCompatActivity
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
                     Intent myIntent = new Intent(AddNoteActivity.this, AlarmReceiver.class);
+                    myIntent.putExtra (AddNoteActivity.EXTRA_TASK_ID, mTaskid);
                     myIntent.putExtra ("note", des);
                     pendingIntent = PendingIntent.getBroadcast(AddNoteActivity.this, 0, myIntent, 0);
                     alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);

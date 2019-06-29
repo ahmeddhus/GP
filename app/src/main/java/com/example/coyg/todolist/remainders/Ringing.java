@@ -9,7 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+
+import com.example.coyg.todolist.MainActivity;
 import com.example.coyg.todolist.R;
+import com.example.coyg.todolist.remainders.alarm.AlarmRinging;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,7 +50,9 @@ public class Ringing extends AppCompatActivity
                 mp.release();
                 stopGeofence();
                 finish();
-                System.exit(0);
+
+                Intent goToMain = new Intent (Ringing.this, MainActivity.class);
+                startActivity (goToMain);
             }
         });
     }

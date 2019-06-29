@@ -370,7 +370,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         @Override
                         public void onFailure(@NonNull Exception e)
                         {
-                            Toast.makeText (MapsActivity.this, "FAILED", Toast.LENGTH_LONG).show ();
+                            Toast.makeText (MapsActivity.this, "FAILED"+e.toString (), Toast.LENGTH_LONG).show ();
                         }
                     });
 

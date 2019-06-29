@@ -45,13 +45,6 @@ public class AlarmService extends IntentService
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "M_CH_ID");
 
-//        NotificationCompat.Builder alamNotificationBuilder = new
-//                NotificationCompat.Builder(
-//                this).setContentTitle("Alarm").setSmallIcon(R.drawable.ic_arrow_back_black_24dp)
-//                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-//                .setContentText(msg);
-
-
         notificationBuilder.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())

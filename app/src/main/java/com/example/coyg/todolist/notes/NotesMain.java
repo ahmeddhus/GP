@@ -49,34 +49,8 @@ public class NotesMain extends Fragment implements Adapter.ItemClickListener
         View view = inflater.inflate (R.layout.fragment_notes, container, false);
 
         initViews(view);
-
-        new ItemTouchHelper (new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
-        {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
-            {
-                return false;
-            }
-            @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir)
-            {
-                AppExecutors.getInstance ().getDiskIO ().execute (new Runnable ()
-                {
-                    @Override
-                    public void run()
-                    {
-                        int position = viewHolder.getAdapterPosition ();
-                        List<TaskEntry> taskEntries = adapter.getmTaskEntries ();
-                        appDatabase.taskDAO ().delete (taskEntries.get (position));
-
-                        deleteFromCloudFirestore(taskEntries.get(position).getId());
-                    }
-                });
-            }
-        }).attachToRecyclerView(recyclerView);
-
-
         setupViewModel ();
+        swapToDel();
 
         return view;
     }
@@ -134,6 +108,35 @@ public class NotesMain extends Fragment implements Adapter.ItemClickListener
                         Log.w(TAG, "Error deleting document", e);
                     }
                 });
+    }
+
+    private void swapToDel()
+    {
+
+        new ItemTouchHelper (new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+        {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+            @Override
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir)
+            {
+                AppExecutors.getInstance ().getDiskIO ().execute (new Runnable ()
+                {
+                    @Override
+                    public void run()
+                    {
+                        int position = viewHolder.getAdapterPosition ();
+                        List<TaskEntry> taskEntries = adapter.getmTaskEntries ();
+                        appDatabase.taskDAO ().delete (taskEntries.get (position));
+
+                        deleteFromCloudFirestore(taskEntries.get(position).getId());
+                    }
+                });
+            }
+        }).attachToRecyclerView(recyclerView);
     }
 
     private String getEmail()

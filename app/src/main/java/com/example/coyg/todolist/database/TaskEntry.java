@@ -26,13 +26,6 @@ public class TaskEntry
     @ColumnInfo(name = "updated_at")
     private String updatedAt;
 
-//    @Ignore
-//    public TaskEntry(String description, Date updatedAt)
-//    {
-//        this.description = description;
-//        this.updatedAt = updatedAt;
-//    }
-
     public TaskEntry(String id, String description, String updatedAt)
     {
 

@@ -3,16 +3,16 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="tab_text_1">Notes</string>
     <string name="tab_text_2">Reminders</string>
-    <string name="add_note_activity">Add Note</string>
+    <string name="add_note_activity">اضافة مذكرة</string>
 
 
-    <string name="add_new_location">Add new location</string>
-    <string name="location_list">Locations</string>
+    <string name="add_new_location">اضف موقع جديد</string>
+    <string name="location_list">المواقع</string>
     <string name="need_location_permission_message">You need to enable location permissions first</string>
     <string name="location_permissions_granted_message">Location Permissions Granted</string>
     <string name="setting_enabled" translatable="false">EnabledSetting</string>
-    <string name="settings_label">Settings</string>
-    <string name="location_permissions">Location Permissions</string>
+    <string name="settings_label">الاعدادات</string>
+    <string name="location_permissions">تصريح الموقع</string>
     <string name="enable_geofences">Enable Geofences</string>
     <string name="privacy">http://www.google.com/policies/privacy</string>
     <string name="ringer_permissions">Ringer Permissions</string>
@@ -20,14 +20,28 @@
     <string name="touch_to_relaunch">Touch to launch the app.</string>
     <string name="back_to_normal">Back to normal</string>
     <string name="location">Location</string>
-    <string name="email">email</string>
-    <string name="password">password</string>
-    <string name="logut">logut</string>
-    <string name="clickBack">Please click BACK again to exit</string>
+    <string name="email">البريدالالكترونى</string>
+    <string name="password">كلمة المرور</string>
+    <string name="logut">تسجيل خروج</string>
+    <string name="clickBack">اضغط مرة اخرى للخروج من التطبيق</string>
     <string name="myEmail">myEmail</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">خريطة</string>
+
+    <string name="close">اغلاق</string>
+    <string name="signup">تسجيل</string>
+    <string name="login">تسجيل دخول</string>
+    <string name="add">اضافة</string>
+    <string name="you_nhave_nreached_n">لقد وصلت !!</string>
+    <string name="description">وصف</string>
+    <string name="_11_11_1111">11/11/1111</string>
+    <string name="exit">خروج</string>
+    <string name="enter">دخول</string>
+    <string name="reminders">سجل المنبهات</string>
+    <string name="name">اسم</string>
+    <string name="done">تم</string>
 
     <string name="facebook_app_id">681745572285685</string>
     <string name="fb_login_protocol_scheme">fb681745572285685</string>
+
 
 </resources>
